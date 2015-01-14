@@ -30,6 +30,8 @@ import org.projectfloodlight.openflow.protocol.instruction.OFInstructions;
 import org.projectfloodlight.openflow.protocol.match.Match;
 import org.projectfloodlight.openflow.protocol.match.MatchField;
 import org.projectfloodlight.openflow.types.DatapathId;
+import org.projectfloodlight.openflow.types.IPv4Address;
+import org.projectfloodlight.openflow.types.IpProtocol;
 import org.projectfloodlight.openflow.types.MacAddress;
 import org.projectfloodlight.openflow.types.OFBufferId;
 import org.projectfloodlight.openflow.types.OFPort;
@@ -63,7 +65,7 @@ import net.floodlightcontroller.threadpool.IThreadPoolService;
 import net.floodlightcontroller.util.OFMessageDamper;
 
 public class LinkDelay implements ILinkDelayService, IFloodlightModule,
-		IOFMessageListener{
+		IOFMessageListener {
 
 	public static final String LINKDELAY = "linkdelay";
 	public static final int LINKDELAY_APP_ID = 5;
@@ -111,7 +113,7 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
 		switch (msg.getType()) {
 		case PACKET_IN:
-			 log.info("PACKET_IN received from sw" + sw.getId());
+			log.info("PACKET_IN received from sw" + sw.getId());
 			// log.info(msg.getDataAsString(sw, msg, cntx));
 			Ethernet eth = IFloodlightProviderService.bcStore.get(cntx,
 					IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
@@ -221,7 +223,7 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 		});
 		packetOutTask = new SingletonTask(ses1, new Runnable() {
 			public void run() {
-				
+
 				sendPacketOut1();
 				sendPacketOut2();
 				sendPacketOut((long) 1, (short) 4);
@@ -341,7 +343,7 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 				.setDestinationMACAddress("00:00:00:12:34:56").setPayload(data);
 		// set actions
 		OFActionOutput output = ofFactory.actions().buildOutput()
-				.setPort(OFPort.CONTROLLER).build();
+				.setPort(OFPort.CONTROLLER).setMaxLen(0xffff).build();
 		// construct Packet_Out
 		OFPacketOut po = ofFactory.buildPacketOut()
 				.setData(ethernet.serialize())
@@ -362,20 +364,21 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 
 		IPv4 data = new IPv4();
 		data.setPayload(new Data(new byte[] { 'd', 'e', 'l', 'a', 'y' }));
-
+		
 		Ethernet ethernet = (Ethernet) new Ethernet()
 				.setSourceMACAddress("5e:a9:9b:a7:f7:2b")
-				.setDestinationMACAddress("00:00:00:12:34:56").setPayload(data);
+				.setDestinationMACAddress("00:00:00:12:34:57").setPayload(data);
 		// set actions
 		OFActionOutput output = ofFactory.actions().buildOutput()
-				.setPort(OFPort.CONTROLLER).build();
+				.setPort(OFPort.CONTROLLER).setMaxLen(0xffff).build();
 		// construct Packet_Out
 		OFPacketOut po = ofFactory.buildPacketOut()
 				.setData(ethernet.serialize())
 				.setBufferId(OFBufferId.NO_BUFFER)
 				.setActions(Collections.singletonList((OFAction) output))
 				.build();
-		sendTime2 = new Date().getTime();
+		log.info(po.toString());
+		sendTime1 = new Date().getTime();
 		log.info("sendtime1: " + sendTime1);
 		iofs_from.write(po);
 		log.info("delay packet sent to switch 1");

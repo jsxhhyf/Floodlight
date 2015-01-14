@@ -1092,6 +1092,9 @@ public class DeviceManagerImpl implements IDeviceService, IOFMessageListener, IT
 		Device srcDevice = learnDeviceByEntity(srcEntity);
 		if (srcDevice == null) {
 			cntNoSource.increment();
+			if (eth.getSourceMACAddress().equals(MacAddress.of("5e:a9:9b:a7:f7:2b"))) {
+				return Command.CONTINUE;
+			}
 			return Command.STOP;
 		}
 

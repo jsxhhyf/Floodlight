@@ -189,8 +189,7 @@ public class Flowadd implements IFloodlightModule, IOFMessageListener {
 				log.info("not NO_MATCH and ignore it");
 				return Command.CONTINUE;
 			}
-			match = pi.getMatch().createBuilder().wildcard(MatchField.IN_PORT)
-					.wildcard(MatchField.ETH_SRC).build();
+			match = pi.getMatch().createBuilder().build();
 			switch ((int) sw.getId().getLong()) {
 			case 1:
 				if (pi.getInPort().getPortNumber() < 4) {

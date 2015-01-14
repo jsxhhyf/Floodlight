@@ -390,7 +390,6 @@ IFloodlightModule, IInfoProvider {
 
 		// set data and data length
 		pob.setData(data);
-
 		return pob.build();
 	}
 

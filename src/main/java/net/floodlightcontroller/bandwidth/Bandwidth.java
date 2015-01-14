@@ -251,7 +251,7 @@ public class Bandwidth implements IFloodlightModule, IOFMessageListener {
 				log.info("no links!");
 				return;
 			}
-			if (bCounter.size() == 0) {
+			if (bCounter.size() < 4) {
 				log.info("no data yet!");
 				return;
 			}

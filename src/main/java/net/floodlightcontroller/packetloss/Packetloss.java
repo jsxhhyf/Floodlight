@@ -203,7 +203,7 @@ public class Packetloss implements IFloodlightModule, IOFMessageListener {
 				log.info("no links!");
 				return;
 			}
-			if (pktCounter.size() == 0) {
+			if (pktCounter.size() < 4) {
 				log.info("no pkt yet!");
 				return;
 			}
