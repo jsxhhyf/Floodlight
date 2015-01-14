@@ -57,7 +57,6 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 	private Map<DatapathId, List<Bytesinports>> byteCounter;
 	private Map<DatapathId, List<Lost>> lostCounter;
 
-
 	public void setFloodlightProvider(
 			IFloodlightProviderService floodlightProvider) {
 		this.floodlightProvider = floodlightProvider;
@@ -117,8 +116,11 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 				// iosw.write(echo, null);
 				for (short i = 0; i < iosw.getPorts().size() - 1; i++) {
 					if (ofFactory.getVersion().compareTo(OFVersion.OF_13) >= 0) {
-						req = ofFactory.buildPortStatsRequest()
-								.setPortNo(org.projectfloodlight.openflow.types.OFPort.of(i)).build();
+						req = ofFactory
+								.buildPortStatsRequest()
+								.setPortNo(
+										org.projectfloodlight.openflow.types.OFPort
+												.of(i)).build();
 						if (req != null) {
 							future = iosw.writeStatsRequest(req);
 							values = (List<OFStatsReply>) future.get(10,
@@ -134,9 +136,12 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 							p.setPacketTX(((OFPortStatsEntry) values.get(0))
 									.getTxPackets().getValue());
 							l.setTXlost(((OFPortStatsEntry) values.get(0))
-									.getTxDropped().getValue());// by phil 2014-11-3 count
-															// packet loss inside ports
-							// log.info("sw" + sw + " port" + (i + 1) + " TX: " +
+									.getTxDropped().getValue());// by phil
+																// 2014-11-3
+																// count
+							// packet loss inside ports
+							// log.info("sw" + sw + " port" + (i + 1) + " TX: "
+							// +
 							// p.getPacketTX());
 							// log.info("TransmitedBytes: "
 							// + b.getBytesTX()
@@ -148,7 +153,8 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 							// + ((b.getBytesTX() - byteCounter.get(sw).get(i)
 							// .getBytesTX()) * 1.6) + ",");
 
-							// log.info("last tx: on switch " + sw + " port " + (i + 1)
+							// log.info("last tx: on switch " + sw + " port " +
+							// (i + 1)
 							// + " " + byteCounter.get(sw).get(i).getBytesTX());
 							// tempByteCounter.get(sw).get(i).setBytesTX(b.getBytesTX());
 							// tempPktCounter.get(sw).get(i).setPacketTX(p.getPacketTX());
@@ -157,9 +163,12 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 							p.setPacketRX(((OFPortStatsEntry) values.get(0))
 									.getRxPackets().getValue());
 							l.setRXlost(((OFPortStatsEntry) values.get(0))
-									.getRxDropped().getValue());// by phil 2014-11-3 count
-															// packet loss inside ports
-							// log.info("sw" + sw + " port" + (i + 1) + " RX: " +
+									.getRxDropped().getValue());// by phil
+																// 2014-11-3
+																// count
+							// packet loss inside ports
+							// log.info("sw" + sw + " port" + (i + 1) + " RX: "
+							// +
 							// p.getPacketRX());
 							// log.info("ReceivedBytes: "
 							// + b.getBytesRX()
@@ -170,7 +179,8 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 							// + ","
 							// + ((b.getBytesRX() - byteCounter.get(sw).get(i)
 							// .getBytesRX()) * 1.6) + ",");
-							// log.info("last rx: on switch " + sw + " port " + (i + 1)
+							// log.info("last rx: on switch " + sw + " port " +
+							// (i + 1)
 							// + " " + byteCounter.get(sw).get(i).getBytesRX());
 							// tempByteCounter.get(sw).get(i).setBytesRX(b.getBytesRX());
 							lbytesList.add(b);
@@ -211,7 +221,7 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 							// }
 						}
 					}
-					
+
 				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -268,8 +278,8 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 	@Override
 	public net.floodlightcontroller.core.IListener.Command receive(
 			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
-				return Command.CONTINUE;
-		
+		return Command.CONTINUE;
+
 	}
 
 	// protected void doFlood(IOFSwitch sw, OFPacketIn pi, FloodlightContext
@@ -338,9 +348,10 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 			throws FloodlightModuleException {
 		this.floodlightProvider = context
 				.getServiceImpl(IFloodlightProviderService.class);
+		this.switchService = context.getServiceImpl(IOFSwitchService.class);
 		messageDamper = new OFMessageDamper(10000, EnumSet.of(OFType.FLOW_MOD),
 				250);
-		
+
 		this.pktCounter = new HashMap<>();
 		this.byteCounter = new HashMap<>();
 		this.lostCounter = new HashMap<>();// by phil 2014-11-3 count packet
