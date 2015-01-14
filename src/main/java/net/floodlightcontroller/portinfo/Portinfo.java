@@ -29,10 +29,12 @@ import net.floodlightcontroller.util.OFMessageDamper;
 import org.projectfloodlight.openflow.protocol.OFFactory;
 import org.projectfloodlight.openflow.protocol.OFMessage;
 import org.projectfloodlight.openflow.protocol.OFPortStatsEntry;
+import org.projectfloodlight.openflow.protocol.OFPortStatsReply;
 import org.projectfloodlight.openflow.protocol.OFStatsReply;
 import org.projectfloodlight.openflow.protocol.OFStatsRequest;
 import org.projectfloodlight.openflow.protocol.OFType;
 import org.projectfloodlight.openflow.protocol.OFVersion;
+import org.projectfloodlight.openflow.protocol.ver13.OFPortConfigSerializerVer13;
 import org.projectfloodlight.openflow.types.DatapathId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,7 +116,7 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 													// packet loss inside ports
 			try {
 				// iosw.write(echo, null);
-				for (short i = 0; i < iosw.getPorts().size() - 1; i++) {
+				for (short i = 1; i < iosw.getPorts().size(); i++) {
 					if (ofFactory.getVersion().compareTo(OFVersion.OF_13) >= 0) {
 						req = ofFactory
 								.buildPortStatsRequest()
@@ -128,14 +130,12 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 							Packets p = new Packets();
 							Bytesinports b = new Bytesinports();
 							Lost l = new Lost();
-							// log.info("get statistics reply on switch " + sw +
-							// " port "
-							// + (i + 1));
-							b.setBytesTX(((OFPortStatsEntry) values.get(0))
+							
+							b.setBytesTX(((OFPortStatsReply) values.get(0)).getEntries().get(0)
 									.getTxBytes().getValue());
-							p.setPacketTX(((OFPortStatsEntry) values.get(0))
+							p.setPacketTX(((OFPortStatsReply) values.get(0)).getEntries().get(0)
 									.getTxPackets().getValue());
-							l.setTXlost(((OFPortStatsEntry) values.get(0))
+							l.setTXlost(((OFPortStatsReply) values.get(0)).getEntries().get(0)
 									.getTxDropped().getValue());// by phil
 																// 2014-11-3
 																// count
@@ -158,11 +158,11 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 							// + " " + byteCounter.get(sw).get(i).getBytesTX());
 							// tempByteCounter.get(sw).get(i).setBytesTX(b.getBytesTX());
 							// tempPktCounter.get(sw).get(i).setPacketTX(p.getPacketTX());
-							b.setBytesRX(((OFPortStatsEntry) values.get(0))
+							b.setBytesRX(((OFPortStatsReply) values.get(0)).getEntries().get(0)
 									.getRxBytes().getValue());
-							p.setPacketRX(((OFPortStatsEntry) values.get(0))
+							p.setPacketRX(((OFPortStatsReply) values.get(0)).getEntries().get(0)
 									.getRxPackets().getValue());
-							l.setRXlost(((OFPortStatsEntry) values.get(0))
+							l.setRXlost(((OFPortStatsReply) values.get(0)).getEntries().get(0)
 									.getRxDropped().getValue());// by phil
 																// 2014-11-3
 																// count

@@ -201,8 +201,12 @@ public class Packetloss implements IFloodlightModule, IOFMessageListener {
 			links = linkDiscovery.getLinks();
 			if (links.size() == 0) {
 				log.info("no links!");
+				return;
 			}
-
+			if (pktCounter.size() == 0) {
+				log.info("no pkt yet!");
+				return;
+			}
 			for (Link l : links.keySet()) {
 				long tx = pktCounter.get(l.getSrc())
 						.get(l.getSrcPort().getPortNumber() - 1).getPacketTX()

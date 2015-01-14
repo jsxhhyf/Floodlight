@@ -45,6 +45,8 @@ import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IOFMessageListener;
 import net.floodlightcontroller.core.IOFSwitch;
+import net.floodlightcontroller.core.IOFSwitchListener;
+import net.floodlightcontroller.core.PortChangeType;
 import net.floodlightcontroller.core.internal.IOFSwitchService;
 import net.floodlightcontroller.core.module.FloodlightModuleContext;
 import net.floodlightcontroller.core.module.FloodlightModuleException;
@@ -61,7 +63,7 @@ import net.floodlightcontroller.threadpool.IThreadPoolService;
 import net.floodlightcontroller.util.OFMessageDamper;
 
 public class LinkDelay implements ILinkDelayService, IFloodlightModule,
-		IOFMessageListener {
+		IOFMessageListener{
 
 	public static final String LINKDELAY = "linkdelay";
 	public static final int LINKDELAY_APP_ID = 5;
@@ -109,7 +111,7 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
 		switch (msg.getType()) {
 		case PACKET_IN:
-			// log.info("PACKET_IN received from sw" + sw.getId());
+			 log.info("PACKET_IN received from sw" + sw.getId());
 			// log.info(msg.getDataAsString(sw, msg, cntx));
 			Ethernet eth = IFloodlightProviderService.bcStore.get(cntx,
 					IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
@@ -214,30 +216,12 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 					switches = switchService.getAllSwitchDpids();
 					log.info("switch number: " + switches.size());
 				} while (switches.size() == 0);
-				// OFMatch ofm = new OFMatch();
-				// ofm.setDataLayerDestination(floodlightProvider.getSwitch((long)2).getPort((short)1).getHardwareAddress());
-				// ofm.setDataLayerSource(floodlightProvider.getSwitch((long)1).getPort((short)4).getHardwareAddress());
-				// ofm.setDataLayerDestination("00:00:00:00:00:04");
-				// ofm.setDataLayerSource("5e:a9:9b:a7:f7:2b");
-				// addFlowMod(floodlightProvider.getSwitch((long) 1), ofm,
-				// (short) 4, (short) 4);
-				// addFlowMod(floodlightProvider.getSwitch((long) 2), ofm,
-				// (short) 1, (short) 1);
 				packetOutTask.reschedule(1, TimeUnit.SECONDS);
 			}
 		});
 		packetOutTask = new SingletonTask(ses1, new Runnable() {
 			public void run() {
-				// do {
-				// try {
-				// Thread.sleep(1000);
-				// } catch (InterruptedException e) {
-				// // TODO Auto-generated catch block
-				// e.printStackTrace();
-				// }
-				// switches = floodlightProvider.getAllSwitchDpids();
-				// } while (switches.size() == 0);
-
+				
 				sendPacketOut1();
 				sendPacketOut2();
 				sendPacketOut((long) 1, (short) 4);
@@ -247,19 +231,9 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 			}
 		});
 		addFlowTask.reschedule(1, TimeUnit.SECONDS);
-
 	}
 
 	public void addFlowMod(IOFSwitch sw, short inport, short outport) {
-
-		// wildcard_hints = ((Integer) sw
-		// .getAttribute(IOFSwitch.PROP_FASTWILDCARDS)).intValue()
-		// & ~OFMatch.OFPFW_IN_PORT;
-		// & ~OFMatch.OFPFW_DL_VLAN
-		// & ~OFMatch.OFPFW_DL_SRC;
-		// & ~OFMatch.OFPFW_DL_DST;
-		// & ~OFMatch.OFPFW_NW_SRC_MASK
-		// & ~OFMatch.OFPFW_NW_DST_MASK;
 
 		OFFactory ofFactory = sw.getOFFactory();
 		Match match = ofFactory.buildMatch()
@@ -347,7 +321,7 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 				.setActions(Collections.singletonList((OFAction) output))
 				.build();
 		sendTime = new Date().getTime();
-		log.info("sendtime: " + sendTime);
+		log.info("sendtime_r: " + sendTime);
 		iofs_from.write(po);
 		log.info("delay packet sent to switch " + from_sw);
 
@@ -406,4 +380,5 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 		iofs_from.write(po);
 		log.info("delay packet sent to switch 1");
 	}
+
 }

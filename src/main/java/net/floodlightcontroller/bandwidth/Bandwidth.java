@@ -59,7 +59,7 @@ import net.floodlightcontroller.threadpool.IThreadPoolService;
  */
 public class Bandwidth implements IFloodlightModule, IOFMessageListener {
 
-	protected static Logger log = LoggerFactory.getLogger(Packetloss.class);
+	protected static Logger log = LoggerFactory.getLogger(Bandwidth.class);
 
 	protected IFloodlightProviderService floodlightProvider;
 	protected IOFSwitchService switchService;
@@ -249,8 +249,12 @@ public class Bandwidth implements IFloodlightModule, IOFMessageListener {
 			links = linkDiscovery.getLinks();
 			if (links.size() == 0) {
 				log.info("no links!");
+				return;
 			}
-
+			if (bCounter.size() == 0) {
+				log.info("no data yet!");
+				return;
+			}
 			for (Link l : links.keySet()) {
 				long tx = bCounter.get(l.getSrc()).get(l.getSrcPort().getPortNumber() - 1)
 						.getBytesTX()
