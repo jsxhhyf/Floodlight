@@ -278,6 +278,7 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 	@Override
 	public net.floodlightcontroller.core.IListener.Command receive(
 			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
+		log.info("111111111111111111");
 		return Command.CONTINUE;
 
 	}

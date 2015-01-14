@@ -38,6 +38,7 @@ import org.projectfloodlight.openflow.protocol.match.MatchField;
 import org.projectfloodlight.openflow.types.MacAddress;
 import org.projectfloodlight.openflow.types.OFBufferId;
 import org.projectfloodlight.openflow.types.OFPort;
+import org.python.antlr.PythonParser.return_stmt_return;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,7 +165,9 @@ public class Flowadd implements IFloodlightModule, IOFMessageListener {
 	 */
 	@Override
 	public boolean isCallbackOrderingPostreq(OFType type, String name) {
-		// TODO Auto-generated method stub
+		if (name.equals("portinfo")) {
+			return true;
+		}
 		return false;
 	}
 
@@ -228,6 +231,7 @@ public class Flowadd implements IFloodlightModule, IOFMessageListener {
 			}
 			return Command.CONTINUE;
 		default:
+			log.info("1111");
 			return Command.CONTINUE;
 		}
 	}

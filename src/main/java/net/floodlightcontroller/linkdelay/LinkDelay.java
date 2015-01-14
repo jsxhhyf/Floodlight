@@ -113,24 +113,20 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
 		switch (msg.getType()) {
 		case PACKET_IN:
-			log.info("PACKET_IN received from sw" + sw.getId());
+			log.info("PACKET_IN received from sw " + sw.getId());
 			// log.info(msg.getDataAsString(sw, msg, cntx));
 			Ethernet eth = IFloodlightProviderService.bcStore.get(cntx,
 					IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
-			// log.info("Source MAC: " +
-			// HexString.toHexString(eth.getSourceMACAddress()) + " Dest MAC: "
-			// + HexString.toHexString(eth.getDestinationMACAddress()));
-			// log.info("data: " + eth.getPayload().serialize()[0]);
-			// log.info("inport: " + ((OFPacketIn) msg).getInPort());
+			log.info("Source MAC: " + eth.getSourceMACAddress() + " Dest MAC: "
+					+ eth.getDestinationMACAddress());
 			long tempTime = new Date().getTime();
-			if (eth.getDestinationMACAddress().getBytes()
-					.equals(HexString.fromHexString("00:00:00:12:34:56"))) {
-
+			if (eth.getDestinationMACAddress().equals(
+					MacAddress.of("00:00:00:12:34:56"))) {
 				receiveTime2 = tempTime;
 				log.info("Time2: " + (receiveTime2 - sendTime2));
 				return Command.STOP;
-			} else if (eth.getDestinationMACAddress().getBytes()
-					.equals(HexString.fromHexString("00:00:00:12:34:57"))) {
+			} else if (eth.getDestinationMACAddress().equals(
+					MacAddress.of("00:00:00:12:34:57"))) {
 				receiveTime1 = tempTime;
 				log.info("Time1: " + (receiveTime1 - sendTime1));
 				return Command.STOP;
@@ -364,7 +360,7 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 
 		IPv4 data = new IPv4();
 		data.setPayload(new Data(new byte[] { 'd', 'e', 'l', 'a', 'y' }));
-		
+
 		Ethernet ethernet = (Ethernet) new Ethernet()
 				.setSourceMACAddress("5e:a9:9b:a7:f7:2b")
 				.setDestinationMACAddress("00:00:00:12:34:57").setPayload(data);
@@ -377,7 +373,6 @@ public class LinkDelay implements ILinkDelayService, IFloodlightModule,
 				.setBufferId(OFBufferId.NO_BUFFER)
 				.setActions(Collections.singletonList((OFAction) output))
 				.build();
-		log.info(po.toString());
 		sendTime1 = new Date().getTime();
 		log.info("sendtime1: " + sendTime1);
 		iofs_from.write(po);

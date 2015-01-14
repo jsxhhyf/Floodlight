@@ -1086,7 +1086,7 @@ public class TopologyManager implements IFloodlightModule, ITopologyService, IRo
 			BSN bsn = (BSN) eth.getPayload();
 			if (bsn == null) return Command.STOP;
 			if (bsn.getPayload() == null) return Command.STOP;
-
+			
 			// It could be a packet other than BSN LLDP, therefore
 			// continue with the regular processing.
 			if (bsn.getPayload() instanceof LLDP == false)
