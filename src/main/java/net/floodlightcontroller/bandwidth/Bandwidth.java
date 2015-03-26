@@ -33,6 +33,7 @@ import org.projectfloodlight.openflow.types.DatapathId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.floodlight.fileControl.FileControl;
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IOFMessageListener;
@@ -211,7 +212,7 @@ public class Bandwidth implements IFloodlightModule, IOFMessageListener {
 
 				do {
 					try {
-						Thread.sleep(100);
+						Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -237,7 +238,7 @@ public class Bandwidth implements IFloodlightModule, IOFMessageListener {
 		});
 		initTask.reschedule(3, TimeUnit.SECONDS);
 		Timer timer = new Timer();
-		timer.schedule(new MyTask(), 5000, 5000);
+		timer.schedule(new MyTask(), 10000, 5000);
 	}
 
 	class MyTask extends TimerTask {
@@ -251,23 +252,29 @@ public class Bandwidth implements IFloodlightModule, IOFMessageListener {
 				log.info("no links!");
 				return;
 			}
+			for (Link link : links.keySet()) {
+				FileControl.record(0, link.toString()+",");
+			}
+			FileControl.record(0, "\n");
 			if (bCounter.size() < 4) {
 				log.info("no data yet!");
 				return;
 			}
 			for (Link l : links.keySet()) {
-				long tx = bCounter.get(l.getSrc()).get(l.getSrcPort().getPortNumber() - 1)
-						.getBytesTX()
-						- tempbCounter.get(l.getSrc()).get(l.getSrcPort().getPortNumber() - 1)
-								.getBytesTX();// total
+				long rx = bCounter.get(l.getDst()).get(l.getDstPort().getPortNumber() - 1)
+						.getBytesRX()
+						- tempbCounter.get(l.getDst()).get(l.getDstPort().getPortNumber() - 1)
+								.getBytesRX();// total
 												// bytes
-												// sent
+												// received
 												// on
 												// the
 												// link
-				log.info("bytes transferred on " + l.toString() + ": " + tx);
-				log.info("bandwidth is :" + tx * 1.6 / 1000 + "KB/s");
+				log.info("bytes transferred on " + l.toString() + ": " + rx);
+				log.info("bandwidth is :" + rx * 1.6 / 1000 + "KB/s");
+				FileControl.record(0, rx+",");
 			}
+			FileControl.record(0, "\n");
 			deepCopy(bCounter, tempbCounter);
 		}
 

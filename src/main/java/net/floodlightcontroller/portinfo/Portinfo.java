@@ -1,5 +1,7 @@
 package net.floodlightcontroller.portinfo;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -111,7 +113,7 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 			IOFSwitch iosw = switchService.getSwitch(sw);
 			OFFactory ofFactory = iosw.getOFFactory();
 			List<Packets> lPackets = new ArrayList<>();
-			List<Bytesinports> lbytesList = new ArrayList<>();
+			List<Bytesinports> lbytes = new ArrayList<>();
 			List<Lost> llost = new ArrayList<>();// by phil 2014-11-3 count
 													// packet loss inside ports
 			try {
@@ -130,15 +132,18 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 							Packets p = new Packets();
 							Bytesinports b = new Bytesinports();
 							Lost l = new Lost();
-							
-							b.setBytesTX(((OFPortStatsReply) values.get(0)).getEntries().get(0)
-									.getTxBytes().getValue());
-							p.setPacketTX(((OFPortStatsReply) values.get(0)).getEntries().get(0)
-									.getTxPackets().getValue());
-							l.setTXlost(((OFPortStatsReply) values.get(0)).getEntries().get(0)
-									.getTxDropped().getValue());// by phil
-																// 2014-11-3
-																// count
+
+							b.setBytesTX(((OFPortStatsReply) values.get(0))
+									.getEntries().get(0).getTxBytes()
+									.getValue());
+							p.setPacketTX(((OFPortStatsReply) values.get(0))
+									.getEntries().get(0).getTxPackets()
+									.getValue());
+							l.setTXlost(((OFPortStatsReply) values.get(0))
+									.getEntries().get(0).getTxDropped()
+									.getValue());// by phil
+													// 2014-11-3
+													// count
 							// packet loss inside ports
 							// log.info("sw" + sw + " port" + (i + 1) + " TX: "
 							// +
@@ -158,14 +163,17 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 							// + " " + byteCounter.get(sw).get(i).getBytesTX());
 							// tempByteCounter.get(sw).get(i).setBytesTX(b.getBytesTX());
 							// tempPktCounter.get(sw).get(i).setPacketTX(p.getPacketTX());
-							b.setBytesRX(((OFPortStatsReply) values.get(0)).getEntries().get(0)
-									.getRxBytes().getValue());
-							p.setPacketRX(((OFPortStatsReply) values.get(0)).getEntries().get(0)
-									.getRxPackets().getValue());
-							l.setRXlost(((OFPortStatsReply) values.get(0)).getEntries().get(0)
-									.getRxDropped().getValue());// by phil
-																// 2014-11-3
-																// count
+							b.setBytesRX(((OFPortStatsReply) values.get(0))
+									.getEntries().get(0).getRxBytes()
+									.getValue());
+							p.setPacketRX(((OFPortStatsReply) values.get(0))
+									.getEntries().get(0).getRxPackets()
+									.getValue());
+							l.setRXlost(((OFPortStatsReply) values.get(0))
+									.getEntries().get(0).getRxDropped()
+									.getValue());// by phil
+													// 2014-11-3
+													// count
 							// packet loss inside ports
 							// log.info("sw" + sw + " port" + (i + 1) + " RX: "
 							// +
@@ -183,42 +191,42 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 							// (i + 1)
 							// + " " + byteCounter.get(sw).get(i).getBytesRX());
 							// tempByteCounter.get(sw).get(i).setBytesRX(b.getBytesRX());
-							lbytesList.add(b);
+							lbytes.add(b);
 							lPackets.add(p);
 							llost.add(l);
 							// log.info("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-");
 							// out.flush();
-							// if (sw == (long) 2 && i == (short) 0) {
-							// bw[0][1] = (double) (b.getBytesRX() - byteCounter
-							// .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
-							// } else if (sw == (long) 3 && i == (short) 2) {
-							// bw[0][2] = (double) (b.getBytesRX() - byteCounter
-							// .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
-							// } else if (sw == (long) 4 && i == (short) 1) {
-							// bw[0][3] = (double) (b.getBytesRX() - byteCounter
-							// .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
-							// } else if (sw == (long) 3 && i == (short) 0) {
-							// bw[1][2] = (double) (b.getBytesRX() - byteCounter
-							// .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
-							// } else if (sw == (long) 3 && i == (short) 1) {
-							// bw[3][2] = (double) (b.getBytesRX() - byteCounter
-							// .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
-							// } else if (sw == (long) 1 && i == (short) 3) {
-							// bw[1][0] = (double) (b.getBytesRX() - byteCounter
-							// .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
-							// } else if (sw == (long) 1 && i == (short) 5) {
-							// bw[2][0] = (double) (b.getBytesRX() - byteCounter
-							// .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
-							// } else if (sw == (long) 1 && i == (short) 4) {
-							// bw[3][0] = (double) (b.getBytesRX() - byteCounter
-							// .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
-							// } else if (sw == (long) 2 && i == (short) 1) {
-							// bw[2][1] = (double) (b.getBytesRX() - byteCounter
-							// .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
-							// } else if (sw == (long) 4 && i == (short) 0) {
-							// bw[2][3] = (double) (b.getBytesRX() - byteCounter
-							// .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
-							// }
+//							 if (sw.getLong() == (long) 2 && i == (short) 0) {
+//							 bw[0][1] = (double) (b.getBytesRX() - byteCounter
+//							 .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
+//							 } else if (sw.getLong() == (long) 3 && i == (short) 2) {
+//							 bw[0][2] = (double) (b.getBytesRX() - byteCounter
+//							 .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
+//							 } else if (sw.getLong() == (long) 4 && i == (short) 1) {
+//							 bw[0][3] = (double) (b.getBytesRX() - byteCounter
+//							 .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
+//							 } else if (sw.getLong() == (long) 3 && i == (short) 0) {
+//							 bw[1][2] = (double) (b.getBytesRX() - byteCounter
+//							 .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
+//							 } else if (sw.getLong() == (long) 3 && i == (short) 1) {
+//							 bw[3][2] = (double) (b.getBytesRX() - byteCounter
+//							 .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
+//							 } else if (sw.getLong() == (long) 1 && i == (short) 3) {
+//							 bw[1][0] = (double) (b.getBytesRX() - byteCounter
+//							 .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
+//							 } else if (sw.getLong() == (long) 1 && i == (short) 5) {
+//							 bw[2][0] = (double) (b.getBytesRX() - byteCounter
+//							 .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
+//							 } else if (sw.getLong() == (long) 1 && i == (short) 4) {
+//							 bw[3][0] = (double) (b.getBytesRX() - byteCounter
+//							 .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
+//							 } else if (sw.getLong() == (long) 2 && i == (short) 1) {
+//							 bw[2][1] = (double) (b.getBytesRX() - byteCounter
+//							 .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
+//							 } else if (sw.getLong() == (long) 4 && i == (short) 0) {
+//							 bw[2][3] = (double) (b.getBytesRX() - byteCounter
+//							 .get(sw).get(i).getBytesRX()) * 1.6 / 1000000;
+//							 }
 						}
 					}
 
@@ -233,9 +241,11 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			byteCounter.put(sw, lbytesList);
+			byteCounter.put(sw, lbytes);
 			pktCounter.put(sw, lPackets);
 			lostCounter.put(sw, llost);
+			
+			
 		}
 		// log.info("----------------BW-------------------");
 		// log.info("     |  SW1  |  SW2  |  SW3  |  SW4  ");
@@ -260,7 +270,8 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 		// // TODO Auto-generated catch block
 		// e.printStackTrace();
 		// }
-
+		
+		
 	}
 
 	@Override
@@ -278,7 +289,7 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 	@Override
 	public net.floodlightcontroller.core.IListener.Command receive(
 			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
-		log.info("111111111111111111");
+		// log.info("111111111111111111");
 		return Command.CONTINUE;
 
 	}
@@ -358,12 +369,7 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 		this.lostCounter = new HashMap<>();// by phil 2014-11-3 count packet
 											// loss inside ports
 
-		// this.bw = new double[4][4];
-		// for (int i = 0; i < 4; i++) {
-		// for (int j = 0; j < 4; j++) {
-		// bw[i][j] = 0;
-		// }
-		// }
+
 	}
 
 	@Override
@@ -384,6 +390,7 @@ public class Portinfo implements IFloodlightModule, IOFMessageListener,
 		public void run() {
 			// TODO Auto-generated method stub
 			do {
+				log.info("no switches yet!");
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {

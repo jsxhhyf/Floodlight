@@ -27,5 +27,4 @@ net.floodlightcontroller.firewall.Firewall
 net.floodlightcontroller.portinfo.Portinfo
 net.floodlightcontroller.bandwidth.Bandwidth
 net.floodlightcontroller.packetloss.Packetloss
-net.floodlightcontroller.linkdelay.LinkDelay
 net.floodlightcontroller.flowadd.Flowadd
